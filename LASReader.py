@@ -93,8 +93,14 @@ class LASItem(object):
 
     @classmethod
     def from_line(cls, line):
+        # Some comments on the matching: The standard is ambiguous on how colons may appear.
+        # In addition, relevant input is not conforming to the standard, it appears.
+        # Colons may appear both as a field separator, and in date fields, appearing both
+        # as descriptions and as data values. The regexp as it stands now looks for a
+        # colon and one or more whitespace to separate the data value and the description.
         name, units, data, descr = \
-            re.match(r"([^\.: \t\[\]\|]*)\s*\.([^\.: \t\[\]\|]*)?\s*([^:{}\|]*)?:\s*(.*)", line).groups()
+            re.match(r"([^\.: \t\[\]\|]*)\s*\.([^\.: \t\[\]\|]*)?\s*([^{}\|]*)?:\s+(.*)", line).groups()
+
 
         # first, descr = line.rsplit(':', 1)
         # descr = descr.strip()
