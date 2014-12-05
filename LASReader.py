@@ -283,6 +283,11 @@ class LASReader(object):
         Units of the 'STEP' item from the '~W' section.
         The value will be None if 'STEP' was not given in the file.
 
+    to_dataframe(): pandas.Dataframe
+        Creates a pandas Dataframe from the data, with proper
+        date index. This assumes the dates are provided in the LAS file
+        as comments to the STRT field
+
     """
 
     def __init__(self, f, null_subs=None):
@@ -406,6 +411,17 @@ class LASReader(object):
         if opened_here:
             f.close()
 
+    def to_dataframe(self):
+        import datetime
+        import pandas as pd
+        startdate = np.datetime64(datetime.datetime.strptime( 
+            self.well.STRT.descr, '%Y/%m/%d %H:%M'))
+        idx = np.array(self.data['TIME'],dtype='timedelta64[s]')
+        
+        pdidx = pd.DatetimeIndex(startdate + idx)     
+        data = pd.DataFrame(self.data, index = pdidx)
+        return data
+        
 
 if __name__ == "__main__":
     import sys
